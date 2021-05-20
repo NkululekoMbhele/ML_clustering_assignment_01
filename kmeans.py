@@ -17,7 +17,6 @@ def euclidean_distance(x1, x2):
 
 def predict(X):
     X = X
-   
     N_SAMPLES, N_FEATURES = X.shape
    
     # initialize
@@ -28,43 +27,41 @@ def predict(X):
     for _ in range(MAX_ITERS):
         # Assign samples to closest CENTROIDS (create CLUSTERS)
         print(f"Iteration {iteration_count}\n")
-        CLUSTERS = _create_CLUSTERS(CENTROIDS)
-        print(CENTROIDS)
-        for i in range(3):
-            example_numbers = ",".join(map(str, CLUSTERS[i]))
-            centroid_ = ",".join(map(str, CENTROIDS[i]))
-            print(f"Cluster {i}: {example_numbers}")           
+        CLUSTERS = _create_CLUSTERS(CENTROIDS)             
+        cent_list = []
+        for i in range(3): 
+            new_exams_numbers = []
+            for item in CLUSTERS[i]:
+                new_exams_numbers.append(item + 1)
+                
+            example_numbers = ",".join(map(str, new_exams_numbers))
+            centroid_ = str(round(CENTROIDS[i][0], 2)) + "," + str(round(CENTROIDS[i][1], 2))
+            print(f"Cluster {i+1}: {example_numbers}")           
             print(f"Centroid: ({centroid_})\n")
         iteration_count += 1
 
         print("")
-        # if PLOT_STEPS:
-        #     plot()
-
+        
         # Calculate new CENTROIDS from the CLUSTERS
         CENTROIDS_old = CENTROIDS
         CENTROIDS = _get_CENTROIDS(CLUSTERS)
 
         # check if CLUSTERS have changed
-        if _is_converged(CENTROIDS_old, CENTROIDS):
+        if check_if_converge(CENTROIDS_old, CENTROIDS):
             break
 
-        # if PLOT_STEPS:
-        #     plot()
-       
-
     # Classify samples as the index of their CLUSTERS
-    return _get_cluster_labels(CLUSTERS)
+    return get_exmp_numbers(CLUSTERS)
 
 
-def _get_cluster_labels(CLUSTERS):
+def get_exmp_numbers(CLUSTERS):
     # each sample will get the label of the cluster it was assigned to
-    labels = np.empty(N_SAMPLES)
+    get_exmp_numbers = np.empty(N_SAMPLES)
 
-    for cluster_idx, cluster in enumerate(CLUSTERS):
+    for cluster_index, cluster in enumerate(CLUSTERS):
         for sample_index in cluster:
-            labels[sample_index] = cluster_idx
-    return labels
+            get_exmp_numbers[sample_index] = cluster_index+1
+    return get_exmp_numbers
 
 def _create_CLUSTERS(CENTROIDS):
     # Assign the samples to the closest CENTROIDS to create CLUSTERS
@@ -88,7 +85,7 @@ def _get_CENTROIDS(CLUSTERS):
         CENTROIDS[cluster_idx] = cluster_mean
     return CENTROIDS
 
-def _is_converged(CENTROIDS_old, CENTROIDS):
+def check_if_converge(CENTROIDS_old, CENTROIDS):
     # distances between each old and new CENTROIDS, fol all CENTROIDS
     distances = [euclidean_distance(CENTROIDS_old[i], CENTROIDS[i]) for i in range(K)]
     return sum(distances) == 0
@@ -110,10 +107,6 @@ X = [
     [2,10],[2,5],[8,4],[5,8],[7,5],[6,4],[1,2],[4,9]
 ]
 X = np.array(X)  
-# X, y = make_blobs(centers=3, n_samples=500, n_features=2, shuffle=True, random_state=40)
-
-    
-# clusters = len(np.unique(y))
 
 
 predict(X)
